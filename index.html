@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Music Player</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(160deg,#0f0c29,#302b63,#000);
+color:white;
+padding:20px;
+}
+
+/* PLAYER CARD */
+.player{
+width:100%;
+max-width:380px;
+background:rgba(255,255,255,0.06);
+border-radius:25px;
+overflow:hidden;
+box-shadow:0 20px 60px rgba(0,0,0,0.6);
+backdrop-filter:blur(18px);
+}
+
+/* COVER SECTION */
+.cover-area{
+padding:25px;
+text-align:center;
+}
+
+.cover-area img{
+width:220px;
+height:220px;
+border-radius:18px;
+object-fit:cover;
+box-shadow:0 15px 40px rgba(0,0,0,0.6);
+}
+
+/* SONG INFO */
+.info{
+padding:0 25px;
+text-align:center;
+}
+
+.song-title{
+font-size:20px;
+font-weight:600;
+margin-top:10px;
+}
+
+.artist{
+font-size:14px;
+color:#ccc;
+margin-bottom:15px;
+}
+
+/* PROGRESS */
+.progress-container{
+width:100%;
+height:6px;
+background:#222;
+cursor:pointer;
+}
+
+.progress{
+height:100%;
+width:0%;
+background:#8a5cff;
+}
+
+/* CONTROLS AREA */
+.controls-area{
+padding:20px;
+background:rgba(0,0,0,0.4);
+}
+
+.controls{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:25px;
+margin-bottom:15px;
+}
+
+.controls button{
+background:#1a1a1a;
+border:none;
+width:48px;
+height:48px;
+border-radius:50%;
+font-size:18px;
+color:white;
+cursor:pointer;
+transition:.3s;
+}
+
+.controls button:hover{
+transform:scale(1.15);
+background:#8a5cff;
+}
+
+.play{
+width:60px!important;
+height:60px!important;
+font-size:24px!important;
+}
+
+/* VOLUME */
+.volume input{
+width:100%;
+}
+
+/* RESPONSIVE */
+@media(max-width:420px){
+.cover-area img{
+width:180px;
+height:180px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="player" id="player">
+
+<div class="cover-area">
+<img id="cover">
+</div>
+
+<div class="info">
+<div class="song-title" id="title"></div>
+<div class="artist" id="artist"></div>
+</div>
+
+<div class="progress-container" onclick="setProgress(event)">
+<div class="progress" id="progress"></div>
+</div>
+
+<div class="controls-area">
+
+<div class="controls">
+<button onclick="prevSong()">⏮</button>
+<button class="play" onclick="togglePlay()">▶</button>
+<button onclick="nextSong()">⏭</button>
+<button onclick="replaySong()">🔁</button>
+<button onclick="muteToggle()">🔊</button>
+</div>
+
+<div class="volume">
+<input type="range" min="0" max="1" step="0.01" value="1" onchange="changeVolume(this.value)">
+</div>
+
+</div>
+
+</div>
+
+<audio id="audio"></audio>
+
+<script>
+const songs=[
+{artist:"ARJIT SINGH",title:"WOH DIN BHI KIYA DIN THAY",src:"09.02.2026_06.27.29_REC.mp4",cover:"r3873vok_arijit-singh_625x300_27_January_26.webp"},
+{artist:"KRISH MANDAL",title:"HMNAY WAHI LAGAYA DIL",src:"09.02.2026_04.31.43_REC.mp4",cover:"images.jpg"},
+{artist:"TALWINDER",title:"PAL PAL",src:"09.02.2026_04.27.06_REC.mp4",cover:"images (1).jpg"}
+];
+
+let index=0;
+let isPlaying=false;
+
+const audio=document.getElementById("audio");
+const title=document.getElementById("title");
+const artist=document.getElementById("artist");
+const cover=document.getElementById("cover");
+const progress=document.getElementById("progress");
+const playBtn=document.querySelector(".play");
+
+function loadSong(){
+audio.src=songs[index].src;
+title.textContent=songs[index].title;
+artist.textContent=songs[index].artist;
+cover.src=songs[index].cover;
+}
+loadSong();
+
+function togglePlay(){
+if(isPlaying){
+audio.pause();
+playBtn.textContent="▶";
+}else{
+audio.play();
+playBtn.textContent="⏸";
+}
+isPlaying=!isPlaying;
+}
+
+function nextSong(){
+index=(index+1)%songs.length;
+loadSong();
+audio.play();
+playBtn.textContent="⏸";
+isPlaying=true;
+}
+
+function prevSong(){
+index=(index-1+songs.length)%songs.length;
+loadSong();
+audio.play();
+playBtn.textContent="⏸";
+isPlaying=true;
+}
+
+function replaySong(){
+audio.currentTime=0;
+audio.play();
+}
+
+function changeVolume(val){
+audio.volume=val;
+}
+
+function muteToggle(){
+audio.muted=!audio.muted;
+}
+
+audio.addEventListener("timeupdate",()=>{
+if(audio.duration){
+const percent=(audio.currentTime/audio.duration)*100;
+progress.style.width=percent+"%";
+}
+});
+
+audio.addEventListener("ended",nextSong);
+
+function setProgress(e){
+const width=e.currentTarget.clientWidth;
+const clickX=e.offsetX;
+audio.currentTime=(clickX/width)*audio.duration;
+}
+</script>
+
+</body>
+</html>
